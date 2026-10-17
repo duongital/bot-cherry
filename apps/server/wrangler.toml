@@ -1,0 +1,13 @@
+name = "bot-cherry-server"
+main = "src/index.ts"
+compatibility_date = "2025-02-04"
+compatibility_flags = ["nodejs_compat"]
+
+# Non-secret vars (safe to commit). Update with your real URLs after deploy.
+[vars]
+BETTER_AUTH_URL = "http://localhost:8787"
+CLIENT_URL = "http://localhost:5173"
+
+# Secrets: set locally in `.dev.vars` and in production via:
+#   wrangler secret put BETTER_AUTH_SECRET
+#   wrangler secret put DATABASE_URL
