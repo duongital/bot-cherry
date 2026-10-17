@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { swaggerUI } from "@hono/swagger-ui";
 import { createAuth, type Auth } from "./auth";
 import { openApiDocument } from "./openapi";
@@ -24,8 +25,21 @@ function getAuth(env: Bindings): Auth {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// better-auth handles all auth routes and their CORS preflight itself
-// (see `trustedOrigins` in auth.ts).
+// CORS must be handled explicitly: better-auth's `trustedOrigins` only covers
+// CSRF protection, not the Access-Control-* response headers the browser needs
+// for cross-origin requests with credentials. The origin is read per-request
+// from the env binding (only available inside the handler).
+app.use("/api/auth/*", (c, next) =>
+  cors({
+    origin: c.env.CLIENT_URL,
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["GET", "POST", "OPTIONS"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
+    credentials: true,
+  })(c, next),
+);
+
 app.all("/api/auth/*", (c) => getAuth(c.env).handler(c.req.raw));
 
 app.get("/api/health", (c) =>
