@@ -5,8 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 
 # Non-secret vars (safe to commit). Update with your real URLs after deploy.
 [vars]
-BETTER_AUTH_URL = "https://bot-cherry-server.duong-a07.workers.dev"
-CLIENT_URL = "https://bot-cherry-client.pages.dev"
+BETTER_AUTH_URL = "https://cherry-api.duongital.com"
+CLIENT_URL = "https://cherry.duongital.com"
 
 # Secrets: set locally in `.dev.vars` and in production via:
 #   wrangler secret put BETTER_AUTH_SECRET
