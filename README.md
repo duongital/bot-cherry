@@ -146,9 +146,9 @@ Add these repository **variables** (not secrets) in
 
 The `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are the same
 ones used by the server workflow. The token also needs the
-**Cloudflare Pages: Edit** permission. Create the Pages project once (dashboard or
-`pnpm exec wrangler pages project create bot-cherry-client --production-branch=main`)
-before the first CI deploy.
+**Cloudflare Pages: Edit** permission. The workflow creates the Pages project
+automatically if it does not exist yet (you can also create it in the dashboard,
+or with `pnpm exec wrangler pages project create bot-cherry-client --production-branch=main`).
 
 Manual alternative:
 
