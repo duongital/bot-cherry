@@ -101,20 +101,43 @@ pnpm db:generate    # generate SQL migrations to apps/server/drizzle
 
 ## Deploy
 
-```bash
-# Server -> Cloudflare Worker
-cd apps/server
-pnpm exec wrangler secret put BETTER_AUTH_SECRET
-pnpm exec wrangler secret put DATABASE_URL
-pnpm deploy
+### Server -> Cloudflare Worker (GitHub Actions)
 
-# Client -> Cloudflare Pages
+Pushing to `main` with changes under `apps/server/` runs
+`.github/workflows/deploy-server.yml`, which typechecks the Worker, syncs its
+runtime secrets, and runs `wrangler deploy`. You can also trigger it manually
+from the **Actions** tab (`workflow_dispatch`).
+
+Add these repository secrets in GitHub:
+
+> **Settings -> Secrets and variables -> Actions -> New repository secret**
+
+| Secret                  | Where to get it                                                        |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | Cloudflare dashboard -> My Profile -> API Tokens -> *Edit Cloudflare Workers* template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard -> Workers & Pages -> Account ID (right sidebar)   |
+| `DATABASE_URL`          | Same Neon pooler connection string used in `apps/server/.dev.vars`      |
+| `BETTER_AUTH_SECRET`    | Long random string (e.g. `openssl rand -base64 32`)                     |
+
+The workflow sets `DATABASE_URL` and `BETTER_AUTH_SECRET` on the Worker with
+`wrangler secret put` before every deploy, so Cloudflare and GitHub stay in
+sync. `BETTER_AUTH_URL` and `CLIENT_URL` are non-secret vars: update them in
+`apps/server/wrangler.toml` to your deployed URLs and push.
+
+> Alternatively, set the runtime secrets on Cloudflare once with
+> `wrangler secret put` and remove the sync lines from the workflow. The
+> `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets are still required by
+> CI.
+
+### Client -> Cloudflare Pages
+
+```bash
 cd apps/client
 pnpm exec wrangler pages deploy dist
 ```
 
-Then update `BETTER_AUTH_URL` / `CLIENT_URL` (wrangler.toml + Pages env) to the
-real deployed URLs and redeploy.
+Then set `VITE_BETTER_AUTH_URL` to the deployed Worker URL in the Pages project
+environment variables and redeploy.
 
 > **Cross-site cookies:** in production the Worker (`*.workers.dev`) and Pages
 > (`*.pages.dev`) are cross-site, so `auth.ts` sets the session cookie to
