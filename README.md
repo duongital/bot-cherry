@@ -129,15 +129,33 @@ sync. `BETTER_AUTH_URL` and `CLIENT_URL` are non-secret vars: update them in
 > `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets are still required by
 > CI.
 
-### Client -> Cloudflare Pages
+### Client -> Cloudflare Pages (GitHub Actions)
+
+Pushing to `main` with changes under `apps/client/` runs
+`.github/workflows/deploy-client.yml`, which builds the React app and uploads
+`apps/client/dist` with `wrangler pages deploy`. It can also be run manually
+from the **Actions** tab.
+
+Add these repository **variables** (not secrets) in
+**Settings -> Secrets and variables -> Actions -> Variables**:
+
+| Variable                        | Value                                                   |
+| ------------------------------- | ------------------------------------------------------- |
+| `CLOUDFLARE_PAGES_PROJECT_NAME` | Your Pages project name, e.g. `bot-cherry-client`        |
+| `VITE_BETTER_AUTH_URL`          | Deployed Worker URL, e.g. `https://bot-cherry-server.xxx.workers.dev` |
+
+The `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are the same
+ones used by the server workflow. The token also needs the
+**Cloudflare Pages: Edit** permission. Create the Pages project once (dashboard or
+`pnpm exec wrangler pages project create bot-cherry-client --production-branch=main`)
+before the first CI deploy.
+
+Manual alternative:
 
 ```bash
 cd apps/client
 pnpm exec wrangler pages deploy dist
 ```
-
-Then set `VITE_BETTER_AUTH_URL` to the deployed Worker URL in the Pages project
-environment variables and redeploy.
 
 > **Cross-site cookies:** in production the Worker (`*.workers.dev`) and Pages
 > (`*.pages.dev`) are cross-site, so `auth.ts` sets the session cookie to
