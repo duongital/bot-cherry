@@ -6,6 +6,7 @@ import { useSavedItems } from "../hooks/useSavedItems";
 import ResponsesSidebar from "../components/responses/ResponsesSidebar";
 import SavedItemDetail from "../components/responses/SavedItemDetail";
 import SaveItemModal from "../components/responses/SaveItemModal";
+import TagNotePanel from "../components/responses/TagNotePanel";
 import Toast, { type ToastMessage, type ToastType } from "../components/responses/Toast";
 
 export default function ResponsesPage() {
@@ -26,6 +27,7 @@ export default function ResponsesPage() {
     loadMore,
     refreshTags,
     prependItem,
+    updateItem,
     removeItem,
     retry,
   } = useSavedItems(search, activeTag);
@@ -48,6 +50,14 @@ export default function ResponsesPage() {
     [navigate, prependItem, refreshTags, showToast],
   );
 
+  const handleUpdated = useCallback(
+    (updated: Parameters<typeof updateItem>[0]) => {
+      updateItem(updated);
+      void refreshTags();
+    },
+    [refreshTags, updateItem],
+  );
+
   const handleDeleted = useCallback(
     (id: string) => {
       removeItem(id);
@@ -66,6 +76,16 @@ export default function ResponsesPage() {
   const handleBack = useCallback(() => {
     navigate("/responses");
   }, [navigate]);
+
+  const selectedItem = items.find((item) => item.id === itemId);
+  const noteTagName = selectedItem
+    ? selectedItem.tags.includes(activeTag)
+      ? activeTag
+      : selectedItem.tags[0]
+    : undefined;
+  const noteTag = noteTagName
+    ? tags.find((tag) => tag.name === noteTagName)
+    : undefined;
 
   return (
     <div className="dashboard-shell flex min-h-[calc(100dvh-3.5rem)] w-full overflow-hidden bg-base-200 text-base-content">
@@ -103,10 +123,17 @@ export default function ResponsesPage() {
           itemId={itemId}
           onBack={handleBack}
           onDeleted={handleDeleted}
+          onUpdated={handleUpdated}
           onToast={showToast}
           tags={tags}
         />
       </section>
+
+      {noteTag && (
+        <aside className="hidden h-[calc(100dvh-3.5rem)] w-80 shrink-0 flex-col border-l border-base-300 bg-base-100 lg:flex xl:w-96">
+          <TagNotePanel key={noteTag.id} tag={noteTag} />
+        </aside>
+      )}
 
       {draft && (
         <SaveItemModal

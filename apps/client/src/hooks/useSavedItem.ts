@@ -47,5 +47,11 @@ export function useSavedItem(itemId: string | undefined) {
     };
   }, [itemId]);
 
-  return { item, loading, notFound, error };
+  return {
+    item,
+    loading,
+    notFound,
+    error,
+    setItem,
+  };
 }

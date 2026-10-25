@@ -7,7 +7,9 @@ export interface SaveItemModalProps {
   initialContent: string;
   initialFormat: ContentFormat;
   initialTitle: string;
+  initialTags?: string[];
   manual: boolean;
+  mode?: "create" | "edit";
   suggestions: Tag[];
   onClose: () => void;
   onSave: (input: CreateItemInput) => Promise<void>;
@@ -17,15 +19,18 @@ export default function SaveItemModal({
   initialContent,
   initialFormat,
   initialTitle,
+  initialTags = [],
   manual,
+  mode = "create",
   suggestions,
   onClose,
   onSave,
 }: SaveItemModalProps) {
+  const isEdit = mode === "edit";
   const [content, setContent] = useState(initialContent);
   const [title, setTitle] = useState(initialTitle);
   const [format, setFormat] = useState<ContentFormat>(initialFormat);
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(initialTags);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -103,7 +108,13 @@ export default function SaveItemModal({
         tags: finalTags,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save this item");
+      setError(
+        err instanceof Error
+          ? err.message
+          : isEdit
+            ? "Could not update this item"
+            : "Could not save this item",
+      );
     } finally {
       setSaving(false);
     }
@@ -127,12 +138,14 @@ export default function SaveItemModal({
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 id="save-item-title" className="text-xl font-semibold">
-                Save to Responses
+                {isEdit ? "Edit saved response" : "Save to Responses"}
               </h2>
               <p className="mt-1 text-sm text-base-content/60">
-                {manual
-                  ? "Clipboard access was unavailable. Paste your content below."
-                  : "Review the detected content, then add a title and tags."}
+                {isEdit
+                  ? "Update the title, content, format, or tags for this saved response."
+                  : manual
+                    ? "Clipboard access was unavailable. Paste your content below."
+                    : "Review the detected content, then add a title and tags."}
               </p>
             </div>
             <button
@@ -140,7 +153,7 @@ export default function SaveItemModal({
               className="btn btn-ghost btn-sm btn-circle"
               onClick={onClose}
               disabled={saving}
-              aria-label="Close save dialog"
+              aria-label={isEdit ? "Close edit dialog" : "Close save dialog"}
             >
               ✕
             </button>
@@ -158,15 +171,15 @@ export default function SaveItemModal({
                 id="save-item-content"
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
-                readOnly={!manual}
-                rows={manual ? 10 : 6}
+                readOnly={!manual && !isEdit}
+                rows={manual || isEdit ? 10 : 6}
                 placeholder={
                   manual
                     ? "Click here, then press Cmd/Ctrl+V to paste your copied text."
                     : undefined
                 }
                 className={`textarea textarea-bordered w-full resize-y font-mono text-xs leading-relaxed ${
-                  manual ? "" : "bg-base-200/60"
+                  manual || isEdit ? "" : "bg-base-200/60"
                 }`}
               />
               <p className="mt-1 text-xs text-base-content/50">
@@ -251,7 +264,13 @@ export default function SaveItemModal({
               disabled={saving || !title.trim() || !content.trim()}
             >
               {saving && <span className="loading loading-spinner loading-xs" />}
-              {saving ? "Saving…" : "Save"}
+              {saving
+                ? isEdit
+                  ? "Updating…"
+                  : "Saving…"
+                : isEdit
+                  ? "Update"
+                  : "Save"}
             </button>
           </div>
         </form>

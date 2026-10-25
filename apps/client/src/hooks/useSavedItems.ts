@@ -93,6 +93,12 @@ export function useSavedItems(search: string, activeTag: string) {
     ]);
   }, []);
 
+  const updateItem = useCallback((updated: SavedItemSummary) => {
+    setItems((current) =>
+      current.map((item) => (item.id === updated.id ? updated : item)),
+    );
+  }, []);
+
   const removeItem = useCallback((id: string) => {
     setItems((current) => current.filter((item) => item.id !== id));
   }, []);
@@ -107,6 +113,7 @@ export function useSavedItems(search: string, activeTag: string) {
     loadMore,
     refreshTags,
     prependItem,
+    updateItem,
     removeItem,
     retry: loadFirstPage,
   };

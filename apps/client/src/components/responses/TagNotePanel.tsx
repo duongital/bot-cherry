@@ -31,7 +31,7 @@ export default function TagNotePanel({ tag }: { tag: Tag }) {
   }
 
   return (
-    <section className="hidden h-1/2 min-h-56 shrink-0 flex-col border-t border-base-300 bg-base-100 lg:flex">
+    <section className="flex h-full min-h-0 flex-col bg-base-100">
       <div className="border-b border-base-300/70 px-4 py-3">
         <h2 className="truncate text-sm font-semibold">
           Note for <span className="text-primary">#{tag.name}</span>

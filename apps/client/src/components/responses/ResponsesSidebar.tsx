@@ -2,7 +2,6 @@ import type { PasteDraft, SavedItemSummary, Tag } from "../../lib/types";
 import EmptyState from "./EmptyState";
 import PasteButton from "./PasteButton";
 import SavedItemListItem from "./SavedItemListItem";
-import TagNotePanel from "./TagNotePanel";
 
 export default function ResponsesSidebar({
   items,
@@ -40,15 +39,6 @@ export default function ResponsesSidebar({
   onRetry: () => void;
 }) {
   const hasFilters = search.trim().length > 0 || activeTag.length > 0;
-  const selectedItem = items.find((item) => item.id === selectedId);
-  const noteTagName = selectedItem
-    ? selectedItem.tags.includes(activeTag)
-      ? activeTag
-      : selectedItem.tags[0]
-    : undefined;
-  const noteTag = noteTagName
-    ? tags.find((tag) => tag.name === noteTagName)
-    : undefined;
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-base-100">
@@ -178,10 +168,6 @@ export default function ResponsesSidebar({
           </div>
         )}
       </div>
-
-      {noteTag && (
-        <TagNotePanel key={noteTag.id} tag={noteTag} />
-      )}
     </div>
   );
 }

@@ -2,29 +2,33 @@ import { useState } from "react";
 import { itemsApi } from "../../lib/api";
 import { formatFullDate, formatSavedDate } from "../../lib/date";
 import { useSavedItem } from "../../hooks/useSavedItem";
-import type { Tag } from "../../lib/types";
+import type { CreateItemInput, SavedItemSummary, Tag } from "../../lib/types";
 import type { ToastType } from "./Toast";
 import ConfirmDialog from "./ConfirmDialog";
 import EmptyState from "./EmptyState";
 import MarkdownContent from "./MarkdownContent";
+import SaveItemModal from "./SaveItemModal";
 import TagNoteCard from "./TagNoteCard";
 
 export default function SavedItemDetail({
   itemId,
   onBack,
   onDeleted,
+  onUpdated,
   onToast,
   tags,
 }: {
   itemId: string | undefined;
   onBack: () => void;
   onDeleted: (id: string) => void;
+  onUpdated: (item: SavedItemSummary) => void;
   onToast: (type: ToastType, message: string) => void;
   tags: Tag[];
 }) {
-  const { item, loading, notFound, error } = useSavedItem(itemId);
+  const { item, loading, notFound, error, setItem } = useSavedItem(itemId);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   if (!itemId) {
     return (
@@ -87,6 +91,14 @@ export default function SavedItemDetail({
     } catch {
       onToast("error", "Could not copy. Your browser blocked clipboard access.");
     }
+  }
+
+  async function handleUpdate(input: CreateItemInput) {
+    const updated = await itemsApi.update(item!.id, input);
+    setItem(updated);
+    onUpdated(updated);
+    setEditing(false);
+    onToast("success", "Saved item updated.");
   }
 
   async function handleDelete() {
@@ -169,7 +181,42 @@ export default function SavedItemDetail({
             className="btn btn-ghost btn-sm text-error"
             onClick={() => setConfirmingDelete(true)}
           >
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="size-4"
+            >
+              <path d="M4 6h12" />
+              <path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h1A1.5 1.5 0 0 1 12 4.5V6" />
+              <path d="m5.5 6 .7 9.1a1.5 1.5 0 0 0 1.5 1.4h4.6a1.5 1.5 0 0 0 1.5-1.4L14.5 6" />
+              <path d="M8.5 9v4.5M11.5 9v4.5" />
+            </svg>
             Delete
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm border border-base-300"
+            onClick={() => setEditing(true)}
+          >
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="size-4"
+            >
+              <path d="M13.5 3.5a2.12 2.12 0 0 1 3 3L7 16l-4 1 1-4Z" />
+              <path d="m12 5 3 3" />
+            </svg>
+            Edit
           </button>
         </div>
       </header>
@@ -187,6 +234,20 @@ export default function SavedItemDetail({
           <MarkdownContent content={item.content} format={item.contentFormat} />
         </div>
       </article>
+
+      {editing && (
+        <SaveItemModal
+          mode="edit"
+          initialContent={item.content}
+          initialFormat={item.contentFormat}
+          initialTitle={item.title}
+          initialTags={item.tags}
+          manual={false}
+          suggestions={tags}
+          onClose={() => setEditing(false)}
+          onSave={handleUpdate}
+        />
+      )}
 
       {confirmingDelete && (
         <ConfirmDialog

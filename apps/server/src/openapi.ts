@@ -270,6 +270,36 @@ export const openApiDocument = {
           "404": notFound,
         },
       },
+      put: {
+        summary: "Update one saved item",
+        operationId: "updateSavedItem",
+        security: [{ sessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateSavedItem" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Updated saved item with full content",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SavedItem" },
+              },
+            },
+          },
+          "400": errorResponse("Request body must be valid JSON"),
+          "401": unauthorized,
+          "403": errorResponse("Request Origin is not the configured client"),
+          "404": notFound,
+          "413": errorResponse("Request body is too large"),
+          "415": errorResponse("Content-Type must be application/json"),
+          "422": validationError,
+        },
+      },
       delete: {
         summary: "Delete one saved item",
         operationId: "deleteSavedItem",

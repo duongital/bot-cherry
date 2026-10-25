@@ -5,13 +5,12 @@ import TagNoteModal from "./TagNoteModal";
 
 /**
  * Mobile-only read-only preview of a tag note inside the response reader.
- * Editing stays in the sidebar note panel on larger screens.
+ * Editing stays in the right-side note panel on larger screens.
  */
 export default function TagNoteCard({ tag }: { tag: Tag }) {
   const { note, loading, error, saveNote } = useTagNote(tag.id);
   const [editing, setEditing] = useState(false);
-
-  if (loading || error || !note?.content.trim()) return null;
+  const content = note?.content ?? "";
 
   return (
     <>
@@ -30,22 +29,39 @@ export default function TagNoteCard({ tag }: { tag: Tag }) {
             type="button"
             className="btn btn-ghost btn-xs border border-base-300"
             onClick={() => setEditing(true)}
+            disabled={loading}
           >
             Edit
           </button>
         </div>
-        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-base-content">
-          {note.content}
-        </p>
+        {loading ? (
+          <div
+            className="mt-3 animate-pulse space-y-2"
+            aria-label="Loading tag note"
+          >
+            <div className="h-3 w-full rounded bg-base-300/80" />
+            <div className="h-3 w-5/6 rounded bg-base-300/80" />
+          </div>
+        ) : error ? (
+          <p className="mt-3 text-sm text-error">{error}</p>
+        ) : content.trim() ? (
+          <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-base-content">
+            {content}
+          </p>
+        ) : (
+          <p className="mt-3 text-sm text-base-content/50">
+            No note yet. Tap Edit to add one.
+          </p>
+        )}
       </section>
 
       {editing && (
         <TagNoteModal
           tag={tag}
-          initialContent={note.content}
+          initialContent={content}
           onClose={() => setEditing(false)}
-          onSave={async (content) => {
-            await saveNote(content);
+          onSave={async (nextContent) => {
+            await saveNote(nextContent);
             setEditing(false);
           }}
         />

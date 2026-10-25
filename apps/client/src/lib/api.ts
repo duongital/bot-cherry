@@ -89,6 +89,13 @@ export const itemsApi = {
     });
   },
 
+  update(id: string, input: CreateItemInput): Promise<SavedItem> {
+    return apiFetch<SavedItem>(`/api/items/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      body: JSON.stringify(input),
+    });
+  },
+
   remove(id: string): Promise<void> {
     return apiFetch<void>(`/api/items/${encodeURIComponent(id)}`, {
       method: "DELETE",
