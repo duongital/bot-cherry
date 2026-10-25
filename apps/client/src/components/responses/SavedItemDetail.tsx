@@ -132,7 +132,7 @@ export default function SavedItemDetail({
       </div>
 
       <header className="mt-2 flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
+        <div className="order-2 min-w-0 flex-1 sm:order-1">
           <h1 className="break-words text-2xl font-semibold leading-tight tracking-tight text-base-content sm:text-3xl">
             {item.title}
           </h1>
@@ -155,7 +155,7 @@ export default function SavedItemDetail({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="order-1 flex w-full shrink-0 items-center justify-end gap-1.5 sm:order-2 sm:w-auto">
           <button
             type="button"
             className="btn btn-ghost btn-sm border border-base-300"

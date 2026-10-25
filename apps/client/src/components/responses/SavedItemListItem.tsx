@@ -17,8 +17,8 @@ export default function SavedItemListItem({
       aria-current={active ? "page" : undefined}
       className={`block w-full cursor-pointer border-l-[3px] px-4 py-3 text-left transition-colors ${
         active
-          ? "border-primary bg-base-200"
-          : "border-transparent hover:bg-base-200/65"
+          ? "border-l-primary bg-base-200"
+          : "border-l-transparent hover:bg-base-200/65"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
