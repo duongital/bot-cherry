@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 import { swaggerUI } from "@hono/swagger-ui";
 import { getAuth } from "./auth";
@@ -10,6 +10,27 @@ import type { AppEnv } from "./types";
 
 const app = new Hono<AppEnv>();
 
+/**
+ * Browser requests must come from the web client. Native Expo requests have no
+ * Origin header, so they identify themselves with the Expo app scheme through
+ * the `expo-origin` header used by `@better-auth/expo`.
+ */
+function isTrustedRequestOrigin(c: Context<AppEnv>): boolean {
+  const origin = c.req.header("origin");
+  if (origin === c.env.CLIENT_URL) return true;
+
+  const expoOrigin = c.req.header("expo-origin");
+  if (!expoOrigin) return false;
+
+  const scheme = c.env.MOBILE_APP_SCHEME ?? "botcherry";
+  if (expoOrigin === `${scheme}://`) return true;
+
+  return (
+    !c.env.BETTER_AUTH_URL.startsWith("https://") &&
+    expoOrigin.startsWith("exp://")
+  );
+}
+
 // CORS must be handled explicitly: better-auth's `trustedOrigins` only covers
 // CSRF protection, not the Access-Control-* response headers the browser needs
 // for cross-origin requests with credentials. The origin is read per-request
@@ -17,7 +38,7 @@ const app = new Hono<AppEnv>();
 app.use("/api/*", (c, next) =>
   cors({
     origin: c.env.CLIENT_URL,
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowHeaders: ["Content-Type", "Authorization", "expo-origin"],
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
@@ -36,15 +57,13 @@ app.use("/api/*", async (c, next) => {
     isItemOrTagApi &&
     method !== "GET" &&
     method !== "HEAD" &&
-    method !== "OPTIONS"
+    method !== "OPTIONS" &&
+    !isTrustedRequestOrigin(c)
   ) {
-    const origin = c.req.header("origin");
-    if (!origin || origin !== c.env.CLIENT_URL) {
-      return c.json(
-        { error: { code: "FORBIDDEN_ORIGIN", message: "Invalid origin" } },
-        403,
-      );
-    }
+    return c.json(
+      { error: { code: "FORBIDDEN_ORIGIN", message: "Invalid origin" } },
+      403,
+    );
   }
 
   await next();

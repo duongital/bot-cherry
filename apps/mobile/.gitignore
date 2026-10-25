@@ -1,0 +1,22 @@
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Generated native projects (Expo CNG)
+/ios
+/android
+
+# Local env files
+.env*.local
+
+# Native signing / build artifacts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# TypeScript
+*.tsbuildinfo
