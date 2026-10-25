@@ -35,7 +35,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   }
 
   if (session.isPending) {
-    return <div className="card">🍒 Loading…</div>;
+    return <div className="surface-card">🍒 Loading…</div>;
   }
 
   if (session.data) {
@@ -43,7 +43,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   }
 
   return (
-    <form className="card auth-card" onSubmit={handleSubmit}>
+    <form className="surface-card auth-card" onSubmit={handleSubmit}>
       <h1>
         {mode === "login" ? "🍒 Welcome back" : "🍒 Create your account"}
       </h1>
@@ -93,7 +93,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
       {error && <p className="error">{error}</p>}
 
-      <button type="submit" disabled={loading}>
+      <button type="submit" className="app-btn" disabled={loading}>
         {loading
           ? "Please wait…"
           : mode === "login"

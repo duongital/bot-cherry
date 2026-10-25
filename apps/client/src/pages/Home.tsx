@@ -49,26 +49,26 @@ export default function Home() {
 
   return (
     <>
-      <section className="hero">
+      <section className="home-hero">
         <p className="eyebrow">Welcome to bot-cherry</p>
         <h1>
           <span aria-hidden="true">🍒</span> Cherries, but make it bot.
         </h1>
-        <p className="hero-text">
+        <p className="home-hero-text">
           bot-cherry is a small AI chat project with a big soft spot for
           cherries. Here are a few facts about the fruit behind the name.
         </p>
-        <div className="hero-actions">
+        <div className="home-hero-actions">
           {session.data ? (
             <span className="welcome-pill">
               🍒 Signed in as <strong>{session.data.user.email}</strong>
             </span>
           ) : (
             <>
-              <Link to="/signup" className="btn">
+              <Link to="/signup" className="app-btn">
                 Create an account
               </Link>
-              <Link to="/login" className="btn btn-ghost">
+              <Link to="/login" className="app-btn app-btn-ghost">
                 Log in
               </Link>
             </>
