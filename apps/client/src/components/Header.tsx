@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { authClient } from "../lib/auth-client";
 import ThemePicker from "./ThemePicker";
 
@@ -117,7 +117,9 @@ function UserMenu({
 export default function Header() {
   const session = authClient.useSession();
   const navigate = useNavigate();
+  const location = useLocation();
   const [signingOut, setSigningOut] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const userName = session.data?.user.name?.trim();
 
   async function handleSignOut() {
@@ -128,50 +130,193 @@ export default function Header() {
       navigate("/", { replace: true });
     } finally {
       setSigningOut(false);
+      setDrawerOpen(false);
     }
   }
 
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    function handleDesktopChange(event: MediaQueryListEvent) {
+      if (event.matches) setDrawerOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setDrawerOpen(false);
+    }
+
+    desktopQuery.addEventListener("change", handleDesktopChange);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      desktopQuery.removeEventListener("change", handleDesktopChange);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [drawerOpen]);
+
   return (
-    <header className="sticky top-0 z-30 border-b border-base-300 bg-base-100/95 backdrop-blur">
-      <div className="navbar mx-auto min-h-14 w-full max-w-6xl px-4">
-        <div className="navbar-start gap-1">
-          <Link
-            to="/"
-            aria-label="Bot Cherry home"
-            className="inline-flex items-center rounded-full p-2 transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            <CherryIcon className="size-7" />
-          </Link>
+    <>
+      <header className="sticky top-0 z-30 border-b border-base-300 bg-base-100/95 backdrop-blur">
+        <div className="navbar mx-auto min-h-14 w-full max-w-6xl px-4">
+          <div className="navbar-start gap-1">
+            <Link
+              to="/"
+              aria-label="Bot Cherry home"
+              className="inline-flex items-center rounded-full p-2 transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <CherryIcon className="size-7" />
+            </Link>
 
-          <nav aria-label="Main navigation">
-            {session.data && (
-              <NavLink
-                to="/responses"
-                className={({ isActive }) =>
-                  `rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-base-200 text-base-content"
-                      : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
-                  }`
-                }
+            <nav aria-label="Main navigation" className="hidden md:block">
+              {session.data && (
+                <NavLink
+                  to="/responses"
+                  className={({ isActive }) =>
+                    `rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-base-200 text-base-content"
+                        : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
+                    }`
+                  }
+                >
+                  Responses
+                </NavLink>
+              )}
+            </nav>
+          </div>
+
+          <div className="navbar-end gap-2 sm:gap-3">
+            <div className="hidden items-center gap-2 sm:gap-3 md:flex">
+              {userName && (
+                <UserMenu
+                  userName={userName}
+                  signingOut={signingOut}
+                  onSignOut={handleSignOut}
+                />
+              )}
+              <ThemePicker />
+            </div>
+
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-haspopup="dialog"
+              aria-expanded={drawerOpen}
+              aria-controls="mobile-menu"
+              onClick={() => setDrawerOpen(true)}
+              className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-base-content transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:hidden"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden="true"
+                className="size-6"
               >
-                Responses
-              </NavLink>
-            )}
-          </nav>
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
         </div>
+      </header>
 
-        <div className="navbar-end gap-2 sm:gap-3">
-          {userName && (
-            <UserMenu
-              userName={userName}
-              signingOut={signingOut}
-              onSignOut={handleSignOut}
-            />
-          )}
-          <ThemePicker />
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label="Close menu"
+            onClick={() => setDrawerOpen(false)}
+            className="absolute inset-0 cursor-default bg-black/40"
+          />
+
+          <aside
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Main menu"
+            className="absolute inset-y-0 right-0 flex w-72 max-w-[85vw] flex-col border-l border-base-300 bg-base-100 shadow-2xl"
+          >
+            <div className="flex items-center justify-between border-b border-base-300 px-4 py-3">
+              <span className="text-sm font-semibold text-base-content">
+                Menu
+              </span>
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setDrawerOpen(false)}
+                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full text-base-content/70 transition-colors hover:bg-base-200 hover:text-base-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  className="size-5"
+                >
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">
+              {session.data && (
+                <nav aria-label="Mobile navigation" className="flex flex-col gap-1">
+                  <NavLink
+                    to="/responses"
+                    onClick={() => setDrawerOpen(false)}
+                    className={({ isActive }) =>
+                      `rounded-field px-3 py-2.5 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-base-200 text-base-content"
+                          : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
+                      }`
+                    }
+                  >
+                    Responses
+                  </NavLink>
+                </nav>
+              )}
+
+              <div className="flex flex-col gap-2">
+                <span className="px-1 text-xs font-semibold uppercase tracking-wide text-base-content/50">
+                  Theme
+                </span>
+                <ThemePicker className="w-full" />
+              </div>
+
+              {userName && (
+                <div className="mt-auto rounded-box border border-base-300 bg-base-200/50 p-3">
+                  <p className="truncate text-sm font-medium text-base-content">
+                    Hi, {userName}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    disabled={signingOut}
+                    className="mt-2 w-full cursor-pointer rounded-field border border-base-300 bg-base-100 px-3 py-2 text-sm font-medium text-base-content transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {signingOut ? "Signing out…" : "Sign out"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
-      </div>
-    </header>
+      )}
+    </>
   );
 }

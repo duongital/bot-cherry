@@ -51,7 +51,7 @@ function getInitialTheme(): string {
   return DEFAULT_THEME;
 }
 
-export default function ThemePicker() {
+export default function ThemePicker({ className = "" }: { className?: string }) {
   const [theme, setTheme] = useState(getInitialTheme);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -93,10 +93,10 @@ export default function ThemePicker() {
         aria-expanded={open}
         aria-label="Select a theme"
         onClick={() => setOpen((value) => !value)}
-        className="flex cursor-pointer items-center gap-2 rounded-full border border-base-300 bg-base-100 px-3 py-1.5 text-sm font-medium text-base-content shadow-sm transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        className={`flex cursor-pointer items-center gap-2 rounded-full border border-base-300 bg-base-100 px-3 py-1.5 text-sm font-medium text-base-content shadow-sm transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${className}`}
       >
-        <span className="inline-block size-3 rounded-full bg-primary" aria-hidden="true" />
-        <span>{selected.label}</span>
+        <span className="inline-block size-3 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+        <span className="truncate">{selected.label}</span>
         <svg
           viewBox="0 0 20 20"
           fill="none"
@@ -105,7 +105,7 @@ export default function ThemePicker() {
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
-          className={`size-4 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`size-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
         >
           <path d="m5 7.5 5 5 5-5" />
         </svg>

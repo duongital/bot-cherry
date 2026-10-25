@@ -55,9 +55,9 @@ export default function ResponsesSidebar({
       <div className="border-b border-base-300 p-4">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-base font-semibold tracking-tight">
-            Sessions Saved
+            Responses Saved
           </h1>
-          <span className="badge badge-neutral badge-sm tabular-nums">
+          <span className="badge badge-neutral badge-sm rounded-full px-2 tabular-nums">
             {items.length}
             {hasMore ? "+" : ""}
           </span>
