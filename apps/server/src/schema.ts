@@ -1,4 +1,12 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 /**
  * Drizzle schema for better-auth (PostgreSQL).
@@ -60,4 +68,68 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
-export const schema = { user, session, account, verification };
+export const savedItem = pgTable(
+  "saved_item",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    // "markdown" | "plain"; validated in the API.
+    contentFormat: text("content_format").notNull().default("plain"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("saved_item_user_created_idx").on(t.userId, t.createdAt)],
+);
+
+export const tag = pgTable(
+  "tag",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    // Canonical lowercase name.
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("tag_user_name_unique").on(t.userId, t.name),
+    index("tag_user_idx").on(t.userId),
+  ],
+);
+
+export const savedItemTag = pgTable(
+  "saved_item_tag",
+  {
+    savedItemId: text("saved_item_id")
+      .notNull()
+      .references(() => savedItem.id, { onDelete: "cascade" }),
+    tagId: text("tag_id")
+      .notNull()
+      .references(() => tag.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.savedItemId, t.tagId] }),
+    index("saved_item_tag_tag_idx").on(t.tagId),
+  ],
+);
+
+export const schema = {
+  user,
+  session,
+  account,
+  verification,
+  savedItem,
+  tag,
+  savedItemTag,
+};

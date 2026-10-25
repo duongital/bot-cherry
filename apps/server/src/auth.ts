@@ -42,3 +42,15 @@ export function createAuth(env: AuthEnv) {
 }
 
 export type Auth = ReturnType<typeof createAuth>;
+
+// Cache the auth instance per isolate. Workers reuse the isolate across
+// requests, but `env` bindings are only available inside the fetch handler,
+// so we create the instance lazily on first use.
+let cachedAuth: Auth | null = null;
+
+export function getAuth(env: AuthEnv): Auth {
+  if (!cachedAuth) {
+    cachedAuth = createAuth(env);
+  }
+  return cachedAuth;
+}

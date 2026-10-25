@@ -292,3 +292,177 @@ input:focus {
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
 }
+
+/* Responses dashboard */
+
+.dashboard-shell {
+  min-width: 0;
+}
+
+.tag-input:focus {
+  outline: none;
+}
+
+.reader-markdown {
+  color: var(--color-base-content);
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.reader-markdown > :first-child {
+  margin-top: 0;
+}
+
+.reader-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.reader-markdown h1,
+.reader-markdown h2,
+.reader-markdown h3,
+.reader-markdown h4,
+.reader-markdown h5,
+.reader-markdown h6 {
+  margin: 1.6em 0 0.55em;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.reader-markdown h1 {
+  font-size: 1.65rem;
+}
+
+.reader-markdown h2 {
+  font-size: 1.35rem;
+}
+
+.reader-markdown h3 {
+  font-size: 1.15rem;
+}
+
+.reader-markdown p {
+  margin: 0.85em 0;
+}
+
+.reader-markdown a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.reader-markdown ul,
+.reader-markdown ol {
+  margin: 0.85em 0;
+  padding-left: 1.5rem;
+}
+
+.reader-markdown ul {
+  list-style: disc;
+}
+
+.reader-markdown ol {
+  list-style: decimal;
+}
+
+.reader-markdown li {
+  margin: 0.3em 0;
+}
+
+.reader-markdown li > ul,
+.reader-markdown li > ol {
+  margin: 0.3em 0;
+}
+
+.reader-markdown blockquote {
+  margin: 1em 0;
+  padding: 0.35rem 1rem;
+  border-left: 3px solid var(--color-base-300);
+  color: color-mix(in oklab, var(--color-base-content) 68%, transparent);
+}
+
+.reader-markdown hr {
+  margin: 1.5em 0;
+  border: 0;
+  border-top: 1px solid var(--color-base-300);
+}
+
+.reader-markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  border-radius: 0.35rem;
+  border: 1px solid var(--color-base-300);
+  background: color-mix(in oklab, var(--color-base-200) 75%, transparent);
+  padding: 0.12em 0.35em;
+}
+
+.reader-markdown pre {
+  margin: 1em 0;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-base-300);
+  border-radius: 0.75rem;
+  background: var(--color-base-200);
+  padding: 1rem;
+  line-height: 1.55;
+}
+
+.reader-markdown pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.84rem;
+}
+
+.reader-markdown .table-scroll {
+  max-width: 100%;
+  margin: 1.1em 0;
+  overflow-x: auto;
+}
+
+.reader-markdown table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.reader-markdown th,
+.reader-markdown td {
+  border: 1px solid var(--color-base-300);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.reader-markdown th {
+  background: var(--color-base-200);
+  font-weight: 650;
+}
+
+.reader-markdown input[type="checkbox"] {
+  margin-right: 0.4rem;
+}
+
+.reader-markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.plain-content {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--color-base-300);
+  border-radius: 0.75rem;
+  background: var(--color-base-200);
+  padding: 1rem;
+  color: var(--color-base-content);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}

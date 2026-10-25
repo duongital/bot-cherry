@@ -1,4 +1,4 @@
-# Next feature: Paste-to-save dashboard
+# Next feature: Paste-to-save dashboard (`/responses`)
 
 ## 1. Goal
 
@@ -17,7 +17,7 @@ The layout mirrors the reference screenshot:
 
 ### User journey
 
-1. User is signed in and opens `/dashboard`.
+1. User is signed in and opens `/responses`.
 2. User copies an AI answer, Markdown document, or plain text in another app.
 3. User clicks **Paste** in the sidebar.
 4. The app reads the clipboard, detects Markdown vs plain text, and opens a
@@ -34,6 +34,8 @@ The layout mirrors the reference screenshot:
 ### Assumptions / decisions
 
 - One pasted document is one saved item. Folders are out of scope.
+- The public homepage (`/`) must remain unchanged. The new feature lives at
+  `/responses` and is reached through the header navigation or a direct URL.
 - Only save after the modal is submitted. Cancelling leaves no orphan row.
   (Add drafts later if needed.)
 - The clipboard gives us text only; we cannot reliably know the source app or
@@ -60,7 +62,7 @@ The layout mirrors the reference screenshot:
 
 - New database tables for saved items, tags, and item/tag links.
 - Authenticated CRUD API for saved items and tags.
-- Dashboard route with sidebar + reader layout.
+- `/responses` route with sidebar + reader layout.
 - Clipboard paste + manual-paste fallback.
 - Save modal with title, tags, and format.
 - Markdown rendering including tables, lists, code blocks, and quotes.
@@ -380,18 +382,18 @@ In `apps/client/src/App.tsx`:
 
 ```tsx
 <Route
-  path="/dashboard"
+  path="/responses"
   element={
     <RequireAuth>
-      <DashboardPage />
+      <ResponsesPage />
     </RequireAuth>
   }
 />
 <Route
-  path="/dashboard/:itemId"
+  path="/responses/:itemId"
   element={
     <RequireAuth>
-      <DashboardPage />
+      <ResponsesPage />
     </RequireAuth>
   }
 />
@@ -400,23 +402,24 @@ In `apps/client/src/App.tsx`:
 - `RequireAuth` shows a loading state while the session resolves and redirects
   to `/login` when signed out.
 - Keep the existing `/`, `/login`, and `/signup` routes.
-- Add a **Dashboard** link to the currently empty `navbar-center` in
-  `Header.tsx` for signed-in users, and a Dashboard link in `Home.tsx`.
+- Add a **Responses** link to the currently empty `navbar-center` in
+  `Header.tsx` for signed-in users.
+- Do **not** modify `Home.tsx`; the homepage stays exactly as it is.
 - Keep the `Hi, {user name}` greeting and theme picker on the right. Ensure
-  sign-out remains reachable from the header when the dashboard is added.
+  sign-out remains reachable from the header when the Responses route is added.
 - When redirecting to login, preserve the intended path so the user lands on
-  `/dashboard` after signing in.
+  `/responses` after signing in.
 
 ### Component tree
 
 ```
 apps/client/src/
 ├── pages/
-│   └── DashboardPage.tsx          # data loading, selection, paste flow
+│   └── ResponsesPage.tsx          # data loading, selection, paste flow
 ├── components/
 │   ├── auth/RequireAuth.tsx
-│   └── dashboard/
-│       ├── DashboardSidebar.tsx   # header, count, paste, search, list
+│   └── responses/
+│       ├── ResponsesSidebar.tsx   # header, count, paste, search, list
 │       ├── SavedItemListItem.tsx  # title, tags, saved timestamp
 │       ├── SavedItemDetail.tsx    # header, actions, content renderer
 │       ├── MarkdownContent.tsx    # markdown/plain renderer
@@ -461,9 +464,9 @@ Reuse `VITE_BETTER_AUTH_URL` as the API base for now so no deployment variable
 changes are required. Add `VITE_API_URL` only if the API is split from auth
 later.
 
-### Dashboard state
+### Responses page state
 
-`DashboardPage` owns:
+`ResponsesPage` owns:
 
 - `items`, `tags`, loading/error state
 - `search`, `activeTag`
@@ -476,10 +479,10 @@ On create success:
 
 1. Close the modal.
 2. Prepend the returned summary to `items` and increment the count.
-3. Navigate to `/dashboard/:id`.
+3. Navigate to `/responses/:itemId`.
 4. Show a success toast.
 
-Selecting an item navigates to `/dashboard/:id`; the detail component fetches
+Selecting an item navigates to `/responses/:itemId`; the detail component fetches
 full content. On mobile, selection shows the reader and a back button returns
 to the list.
 
@@ -593,7 +596,7 @@ Detail:
   - Copy raw content
   - Delete (with confirmation)
 - Content card with generous padding and readable line length.
-- Empty selection state when visiting `/dashboard` without an item.
+- Empty selection state when visiting `/responses` without an item.
 - Loading skeleton while detail content is fetched.
 - `404` state if the item was deleted in another tab.
 
@@ -638,7 +641,7 @@ Layout:
 - Breakpoint around 900px: single column; list view -> detail view with a back
   button.
 - Keep the site header or replace it with a compact dashboard top bar; either
-  way, keep sign-out and the Dashboard link accessible.
+  way, keep sign-out and the Responses link accessible.
 
 ---
 
@@ -659,11 +662,11 @@ Layout:
 
 9. Add `react-markdown` and `remark-gfm`.
 10. Add shared types and the typed API client.
-11. Add `RequireAuth`, dashboard routes, and Dashboard links in the header and
-    home page.
+11. Add `RequireAuth`, `/responses` routes, and a Responses link in the header.
+    Leave the homepage untouched.
 12. Add Markdown detection and title suggestion utilities.
 
-### Phase 3 — Dashboard UI
+### Phase 3 — Responses dashboard UI
 
 13. Build the dashboard shell, sidebar, item list, and detail view using
     daisyUI semantic colors and the active theme.
@@ -682,7 +685,7 @@ Layout:
 
 21. Add delete confirmation and copy-raw-content.
 22. Add search and tag filtering.
-23. Update the README with the dashboard feature and new API endpoints.
+23. Update the README with the `/responses` dashboard feature and new API endpoints.
 24. Run typecheck/build and complete the manual test checklist.
 
 ---
@@ -733,7 +736,7 @@ Layout:
 
 ## 9. Acceptance criteria
 
-- [ ] A signed-in user can open `/dashboard` and see the sidebar + reader
+- [ ] A signed-in user can open `/responses` and see the sidebar + reader
       layout from the reference.
 - [ ] A signed-out user is redirected to `/login`.
 - [ ] Clicking Paste reads clipboard text and opens the save modal.
@@ -760,7 +763,7 @@ Layout:
 ## 10. Manual test checklist
 
 1. Apply the migration and run `pnpm dev`.
-2. Sign up as User A and open `/dashboard`.
+2. Sign up as User A and open `/responses`.
 3. Paste a Markdown answer containing a table and a code block.
 4. Verify the suggested title, change it, add two tags, and save.
 5. Confirm the item appears immediately and the detail renders correctly.

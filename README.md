@@ -10,6 +10,10 @@ pnpm monorepo with two apps:
 **Phase 1 scope:** email + password login only. No email provider / password reset
 verification is configured yet.
 
+The app also includes a private **Paste-to-save dashboard** at `/responses`.
+Signed-in users can paste Markdown or plain text, add a title and tags, and
+browse, search, filter, copy, and delete their saved responses.
+
 ---
 
 ## Structure
@@ -21,19 +25,26 @@ bot-cherry/
 └── apps/
     ├── server/             # @bot-cherry/server (Cloudflare Worker)
     │   ├── src/
-    │   │   ├── index.ts    # Hono app, /swagger, /doc, /api/health
+    │   │   ├── index.ts    # Hono app, CORS, route mounting, /swagger
     │   │   ├── auth.ts     # better-auth instance
     │   │   ├── db.ts       # drizzle + Neon HTTP driver
-    │   │   ├── schema.ts   # better-auth drizzle schema
-    │   │   └── openapi.ts  # hand-written OpenAPI doc
+    │   │   ├── schema.ts   # auth + saved item/tag drizzle schema
+    │   │   ├── openapi.ts  # hand-written OpenAPI doc
+    │   │   ├── lib/        # session middleware + item validation
+    │   │   └── routes/     # /api/items and /api/tags
+    │   ├── drizzle/        # generated SQL migration
     │   ├── drizzle.config.ts
     │   ├── wrangler.toml
     │   └── .dev.vars       # local secrets (gitignored)
     └── client/             # @bot-cherry/client (Cloudflare Pages)
         └── src/
-            ├── App.tsx             # sign in / sign up / session view
-            ├── lib/auth-client.ts  # better-auth client
-            └── ...
+            ├── App.tsx             # routes, including /responses
+            ├── components/
+            │   ├── auth/           # RequireAuth
+            │   └── responses/      # sidebar, reader, paste modal, tags
+            ├── hooks/              # saved item list/detail state
+            ├── lib/                # API client, Markdown detection, types
+            └── pages/ResponsesPage.tsx
 ```
 
 ## Prerequisites
@@ -99,6 +110,12 @@ pnpm db:push        # create/update tables directly
 pnpm db:generate    # generate SQL migrations to apps/server/drizzle
 ```
 
+The saved responses feature uses three tables:
+
+- `saved_item` — one row per pasted document, scoped to `user_id`.
+- `tag` — per-user lowercase tags with a unique `(user_id, name)` index.
+- `saved_item_tag` — many-to-many links; deleting an item cascades its links.
+
 ## Deploy
 
 ### Server -> Cloudflare Worker (GitHub Actions)
@@ -162,6 +179,42 @@ pnpm exec wrangler pages deploy dist
 > `SameSite=None; Secure`. For a production setup you'll typically put both
 > apps behind a single custom domain (e.g. `api.example.com` +
 > `app.example.com`) so cookies behave like normal same-site cookies.
+
+## Responses dashboard
+
+Open `/responses` after signing in. The page reads the clipboard when you click
+**Paste**, detects Markdown vs plain text, and opens a modal for the title,
+optional tags, and format. Clipboard permission failures fall back to a manual
+paste modal. Nothing is written to the database until you submit the modal.
+
+Rendering uses `react-markdown` + `remark-gfm`; raw HTML is escaped. Plain text
+keeps its whitespace. Search uses `ILIKE` over title/content, and tags can be
+filtered from the sidebar.
+
+### Saved responses API
+
+All item/tag routes require a better-auth session cookie. Item queries are
+always scoped to the session user; another user's item returns `404`.
+
+| Method | Path              | Purpose                                      |
+| ------ | ----------------- | -------------------------------------------- |
+| GET    | `/api/items`      | List summaries; `q`, `tag`, `limit`, `cursor` |
+| POST   | `/api/items`      | Create an item (title, content, format, tags) |
+| GET    | `/api/items/:id`  | Get one item with full content                |
+| DELETE | `/api/items/:id`  | Delete one item                               |
+| GET    | `/api/tags`       | List the current user's tags                  |
+
+`POST`/`DELETE` require an `Origin` header matching `CLIENT_URL`. This also
+applies when testing with `curl`, e.g.:
+
+```bash
+curl -b cookies.txt -H 'Origin: http://localhost:5173' \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"Example","content":"Hello","contentFormat":"plain"}' \
+  http://localhost:8787/api/items
+```
+
+The full request/response schemas are in Swagger UI at `/swagger`.
 
 ## Auth API (better-auth)
 

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { authClient } from "../lib/auth-client";
 
 type Mode = "login" | "signup";
@@ -7,6 +7,9 @@ type Mode = "login" | "signup";
 export default function AuthForm({ mode }: { mode: Mode }) {
   const session = authClient.useSession();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo =
+    (location.state as { from?: string } | null)?.from ?? "/";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +29,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         if (res.error) throw new Error(res.error.message ?? "Sign in failed");
       }
       await session.refetch();
-      navigate("/", { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -39,7 +42,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   }
 
   if (session.data) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (
