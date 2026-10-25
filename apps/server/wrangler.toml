@@ -7,6 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 BETTER_AUTH_URL = "https://cherry-api.duongital.com"
 CLIENT_URL = "https://cherry.duongital.com"
+MOBILE_APP_SCHEME = "botcherry"
 
 # Secrets: set locally in `.dev.vars` and in production via:
 #   wrangler secret put BETTER_AUTH_SECRET

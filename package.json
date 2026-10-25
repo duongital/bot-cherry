@@ -6,6 +6,10 @@
     "dev": "pnpm --parallel -r dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "db:push": "pnpm --filter @bot-cherry/server db:push"
+    "db:push": "pnpm --filter @bot-cherry/server db:push",
+    "dev:mobile": "pnpm --filter @bot-cherry/mobile start",
+    "mobile:ios": "pnpm --filter @bot-cherry/mobile ios",
+    "mobile:android": "pnpm --filter @bot-cherry/mobile android",
+    "mobile:doctor": "pnpm --filter @bot-cherry/mobile exec expo-doctor"
   }
 }

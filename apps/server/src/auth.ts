@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { expo } from "@better-auth/expo";
 import { createDb } from "./db";
 import { schema } from "./schema";
 
@@ -8,17 +9,28 @@ export interface AuthEnv {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   CLIENT_URL: string;
+  MOBILE_APP_SCHEME?: string;
 }
 
 export function createAuth(env: AuthEnv) {
   const db = createDb(env.DATABASE_URL);
   const isProduction = env.BETTER_AUTH_URL.startsWith("https://");
+  const mobileScheme = env.MOBILE_APP_SCHEME ?? "botcherry";
+
+  // Native Expo requests do not have a browser Origin header. The Expo plugin
+  // forwards the app scheme through `expo-origin`, and better-auth checks it
+  // against these trusted origins.
+  const trustedOrigins = [env.CLIENT_URL, `${mobileScheme}://`];
+  if (!isProduction) {
+    trustedOrigins.push("exp://", "http://localhost:8081");
+  }
 
   return betterAuth({
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
-    // Allow the React app (deployed to Cloudflare Pages) to call the auth API.
-    trustedOrigins: [env.CLIENT_URL],
+    // Allow the web app and native mobile app to call the auth API.
+    trustedOrigins,
+    plugins: [expo()],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema,

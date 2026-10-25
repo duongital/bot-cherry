@@ -6,6 +6,7 @@ Guidance for coding agents working in this repository.
 
 - `apps/client` — React 19 + Vite + Tailwind/daisyUI frontend.
 - `apps/server` — Hono + better-auth + Drizzle ORM on Cloudflare Workers.
+- `apps/mobile` — Expo + React Native + Expo Router native client.
 - `apps/server/drizzle` — generated SQL migrations and snapshots.
 - Database is PostgreSQL on Neon.
 
@@ -13,12 +14,15 @@ Guidance for coding agents working in this repository.
 
 ```bash
 pnpm dev                 # run client + server
+pnpm dev:mobile          # run the Expo dev server
 pnpm typecheck           # typecheck all packages
 pnpm build               # build all packages
 pnpm --filter @bot-cherry/client typecheck
 pnpm --filter @bot-cherry/server typecheck
+pnpm --filter @bot-cherry/mobile typecheck
 pnpm --filter @bot-cherry/server db:generate
 pnpm --filter @bot-cherry/server db:push
+pnpm mobile:doctor       # expo-doctor
 ```
 
 ## Database migrations
@@ -61,6 +65,21 @@ If this error appears again:
 On PostgreSQL 18, an otherwise successful repeated `db:push` may still report a
 harmless drop/re-add of an existing composite primary key. Treat it as a
 `drizzle-kit` introspection quirk unless the command fails.
+
+## Mobile conventions
+
+- Use Expo Router under `apps/mobile/src/app`; do not port DOM/React Router code.
+- Store auth state only through `@better-auth/expo` + Expo SecureStore.
+- Custom API calls must send the better-auth cookie via
+  `authClient.getCookie()` and the `expo-origin` header.
+- Keep `app.config.ts` `scheme`, `EXPO_PUBLIC_APP_SCHEME`, and server
+  `MOBILE_APP_SCHEME` in sync (`botcherry`).
+- Android share-sheet capture uses `expo-share-intent` and requires a native
+  development/production build; it is disabled in Expo Go. Shared text is
+  converted to a paste draft by `ShareCaptureProvider`; do not persist it until
+  the user submits the save modal.
+- Use `expo install` for native dependencies so versions match the Expo SDK.
+- Do not commit generated `ios/`, `android/`, `.expo/`, or `.env.local`.
 
 ## Conventions
 
