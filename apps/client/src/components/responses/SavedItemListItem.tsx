@@ -15,7 +15,7 @@ export default function SavedItemListItem({
       type="button"
       onClick={onSelect}
       aria-current={active ? "page" : undefined}
-      className={`w-full border-l-[3px] px-4 py-3 text-left transition-colors ${
+      className={`block w-full cursor-pointer border-l-[3px] px-4 py-3 text-left transition-colors ${
         active
           ? "border-primary bg-base-200"
           : "border-transparent hover:bg-base-200/65"
@@ -30,7 +30,7 @@ export default function SavedItemListItem({
             key={tag}
             className="max-w-28 truncate rounded-full bg-base-300/70 px-2 py-0.5 text-[0.68rem] text-base-content/75"
           >
-            {tag}
+            #{tag}
           </span>
         ))}
         {item.tags.length > 3 && (

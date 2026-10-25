@@ -104,6 +104,7 @@ export default function ResponsesPage() {
           onBack={handleBack}
           onDeleted={handleDeleted}
           onToast={showToast}
+          tags={tags}
         />
       </section>
 

@@ -110,11 +110,13 @@ pnpm db:push        # create/update tables directly
 pnpm db:generate    # generate SQL migrations to apps/server/drizzle
 ```
 
-The saved responses feature uses three tables:
+The saved responses feature uses four tables:
 
 - `saved_item` — one row per pasted document, scoped to `user_id`.
 - `tag` — per-user lowercase tags with a unique `(user_id, name)` index.
 - `saved_item_tag` — many-to-many links; deleting an item cascades its links.
+- `tag_note` — one optional free-form note per tag (`tag_id` is the primary
+  key); deleting a tag cascades its note.
 
 ## Deploy
 
@@ -188,8 +190,12 @@ optional tags, and format. Clipboard permission failures fall back to a manual
 paste modal. Nothing is written to the database until you submit the modal.
 
 Rendering uses `react-markdown` + `remark-gfm`; raw HTML is escaped. Plain text
-keeps its whitespace. Search uses `ILIKE` over title/content, and tags can be
-filtered from the sidebar.
+keeps its whitespace. Search uses `ILIKE` over title/content.
+
+Select a saved item with a tag to open its tag-only note editor in the lower
+half of the sidebar. On mobile, existing tag notes appear as cards in the
+response reader with an **Edit** button that opens a note modal. Tag filtering
+itself does not open a note.
 
 ### Saved responses API
 
@@ -203,6 +209,8 @@ always scoped to the session user; another user's item returns `404`.
 | GET    | `/api/items/:id`  | Get one item with full content                |
 | DELETE | `/api/items/:id`  | Delete one item                               |
 | GET    | `/api/tags`       | List the current user's tags                  |
+| GET    | `/api/tags/:id/note` | Get the note for a tag                    |
+| PUT    | `/api/tags/:id/note` | Create/replace the note for a tag         |
 
 `POST`/`DELETE` require an `Origin` header matching `CLIENT_URL`. This also
 applies when testing with `curl`, e.g.:

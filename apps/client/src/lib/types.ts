@@ -18,6 +18,12 @@ export interface Tag {
   name: string;
 }
 
+export interface TagNote {
+  tagId: string;
+  content: string;
+  updatedAt: string | null;
+}
+
 export interface ItemListResponse {
   items: SavedItemSummary[];
   nextCursor: string | null;

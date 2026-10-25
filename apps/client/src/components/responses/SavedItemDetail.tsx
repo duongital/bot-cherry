@@ -2,21 +2,25 @@ import { useState } from "react";
 import { itemsApi } from "../../lib/api";
 import { formatFullDate, formatSavedDate } from "../../lib/date";
 import { useSavedItem } from "../../hooks/useSavedItem";
+import type { Tag } from "../../lib/types";
 import type { ToastType } from "./Toast";
 import ConfirmDialog from "./ConfirmDialog";
 import EmptyState from "./EmptyState";
 import MarkdownContent from "./MarkdownContent";
+import TagNoteCard from "./TagNoteCard";
 
 export default function SavedItemDetail({
   itemId,
   onBack,
   onDeleted,
   onToast,
+  tags,
 }: {
   itemId: string | undefined;
   onBack: () => void;
   onDeleted: (id: string) => void;
   onToast: (type: ToastType, message: string) => void;
+  tags: Tag[];
 }) {
   const { item, loading, notFound, error } = useSavedItem(itemId);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -126,7 +130,7 @@ export default function SavedItemDetail({
                 key={tag}
                 className="rounded-full border border-base-300 bg-base-100 px-2 py-0.5"
               >
-                {tag}
+                #{tag}
               </span>
             ))}
             <span title={formatFullDate(item.createdAt)}>
@@ -169,6 +173,11 @@ export default function SavedItemDetail({
           </button>
         </div>
       </header>
+
+      {item.tags.map((tagName) => {
+        const tag = tags.find((candidate) => candidate.name === tagName);
+        return tag ? <TagNoteCard key={tag.id} tag={tag} /> : null;
+      })}
 
       <article className="mt-6 rounded-box border border-base-300 bg-base-100 p-5 shadow-sm sm:p-8">
         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-base-content/45">

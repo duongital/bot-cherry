@@ -108,6 +108,23 @@ export const tag = pgTable(
   ],
 );
 
+/**
+ * One free-form note per tag. Kept separate from `tag` so a tag can exist
+ * without a note and notes can grow without touching the tag row.
+ */
+export const tagNote = pgTable("tag_note", {
+  tagId: text("tag_id")
+    .primaryKey()
+    .references(() => tag.id, { onDelete: "cascade" }),
+  content: text("content").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const savedItemTag = pgTable(
   "saved_item_tag",
   {
@@ -131,5 +148,6 @@ export const schema = {
   verification,
   savedItem,
   tag,
+  tagNote,
   savedItemTag,
 };

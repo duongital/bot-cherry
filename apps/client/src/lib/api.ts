@@ -4,6 +4,7 @@ import type {
   SavedItem,
   SavedItemSummary,
   Tag,
+  TagNote,
 } from "./types";
 
 const API_BASE = (
@@ -98,5 +99,21 @@ export const itemsApi = {
 export const tagsApi = {
   list(): Promise<{ tags: Tag[] }> {
     return apiFetch<{ tags: Tag[] }>("/api/tags");
+  },
+
+  getNote(tagId: string): Promise<{ note: TagNote }> {
+    return apiFetch<{ note: TagNote }>(
+      `/api/tags/${encodeURIComponent(tagId)}/note`,
+    );
+  },
+
+  saveNote(tagId: string, content: string): Promise<{ note: TagNote }> {
+    return apiFetch<{ note: TagNote }>(
+      `/api/tags/${encodeURIComponent(tagId)}/note`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ content }),
+      },
+    );
   },
 };

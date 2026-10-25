@@ -55,6 +55,22 @@ export const openApiDocument = {
           name: { type: "string", example: "auth" },
         },
       },
+      TagNote: {
+        type: "object",
+        required: ["tagId", "content", "updatedAt"],
+        properties: {
+          tagId: { type: "string", format: "uuid" },
+          content: {
+            type: "string",
+            example: "Remember to review the auth flow before shipping.",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+          },
+        },
+      },
       SavedItemSummary: {
         type: "object",
         required: [
@@ -290,6 +306,79 @@ export const openApiDocument = {
             },
           },
           "401": unauthorized,
+        },
+      },
+    },
+    "/api/tags/{id}/note": {
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "string", format: "uuid" },
+        },
+      ],
+      get: {
+        summary: "Get the note attached to a tag",
+        operationId: "getTagNote",
+        security: [{ sessionCookie: [] }],
+        responses: {
+          "200": {
+            description: "Tag note (empty content when no note exists)",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["note"],
+                  properties: {
+                    note: { $ref: "#/components/schemas/TagNote" },
+                  },
+                },
+              },
+            },
+          },
+          "401": unauthorized,
+          "404": errorResponse("Tag not found or not owned by current user"),
+        },
+      },
+      put: {
+        summary: "Create or replace the note attached to a tag",
+        operationId: "saveTagNote",
+        security: [{ sessionCookie: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["content"],
+                properties: {
+                  content: { type: "string", maxLength: 20000 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Saved tag note",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["note"],
+                  properties: {
+                    note: { $ref: "#/components/schemas/TagNote" },
+                  },
+                },
+              },
+            },
+          },
+          "400": errorResponse("Request body must be valid JSON"),
+          "401": unauthorized,
+          "403": errorResponse("Request Origin is not the configured client"),
+          "404": errorResponse("Tag not found or not owned by current user"),
+          "422": validationError,
         },
       },
     },

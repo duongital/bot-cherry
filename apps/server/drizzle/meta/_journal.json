@@ -8,6 +8,13 @@
       "when": 1792912832532,
       "tag": "0000_naive_giant_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792914101421,
+      "tag": "0001_powerful_shadowcat",
+      "breakpoints": true
     }
   ]
 }
