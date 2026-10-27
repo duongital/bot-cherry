@@ -1,6 +1,7 @@
 import { Route, Routes, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import RequireAuth from "./components/auth/RequireAuth";
+import HealthPage from "./pages/HealthPage";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -9,7 +10,9 @@ import Signup from "./pages/Signup";
 
 export default function App() {
   const location = useLocation();
-  const isDashboard = location.pathname.startsWith("/responses");
+  const isDashboard =
+    location.pathname.startsWith("/responses") ||
+    location.pathname.startsWith("/health");
 
   return (
     <div className="app">
@@ -32,6 +35,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <ResponsesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/health"
+            element={
+              <RequireAuth>
+                <HealthPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/health/:conversationId"
+            element={
+              <RequireAuth>
+                <HealthPage />
               </RequireAuth>
             }
           />

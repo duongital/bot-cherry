@@ -50,13 +50,14 @@ export default function Home() {
   return (
     <>
       <section className="home-hero">
-        <p className="eyebrow">Welcome to bot-cherry</p>
+        <p className="eyebrow">Welcome to cherry-bot</p>
         <h1>
-          <span aria-hidden="true">🍒</span> Cherries, but make it bot.
+          <span aria-hidden="true">🍒</span> A calmer little AI workspace.
         </h1>
         <p className="home-hero-text">
-          bot-cherry is a small AI chat project with a big soft spot for
-          cherries. Here are a few facts about the fruit behind the name.
+          cherry-bot is a small, private space with a soft spot for cherries.
+          Log how you feel in Health, keep the answers worth remembering in
+          Responses, and enjoy a few cherry facts along the way.
         </p>
         <div className="home-hero-actions">
           {session.data ? (
@@ -73,6 +74,47 @@ export default function Home() {
               </Link>
             </>
           )}
+        </div>
+      </section>
+
+      <section className="apps" aria-labelledby="apps-heading">
+        <div className="apps-heading">
+          <h2 id="apps-heading">Your apps</h2>
+          <p>Two small tools, both private to your account.</p>
+        </div>
+
+        <div className="apps-grid">
+          <Link to="/health" className="app-card">
+            <span className="app-card-icon" aria-hidden="true">
+              🌿
+            </span>
+            <span className="app-card-body">
+              <span className="app-card-title">Health</span>
+              <span className="app-card-description">
+                Describe how you feel, confirm a symptom checklist, and track
+                patterns over time.
+              </span>
+            </span>
+            <span className="app-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </Link>
+
+          <Link to="/responses" className="app-card">
+            <span className="app-card-icon" aria-hidden="true">
+              💬
+            </span>
+            <span className="app-card-body">
+              <span className="app-card-title">Responses</span>
+              <span className="app-card-description">
+                Save useful AI responses, organize them with tags, and keep
+                notes alongside them.
+              </span>
+            </span>
+            <span className="app-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </Link>
         </div>
       </section>
 

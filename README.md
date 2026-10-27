@@ -1,4 +1,4 @@
-# bot-cherry
+# cherry-bot
 
 pnpm monorepo with three apps:
 
@@ -21,7 +21,7 @@ experience is available in the native Expo app under `apps/mobile`.
 ## Structure
 
 ```
-bot-cherry/
+cherry-bot/
 ├── package.json            # workspace root scripts
 ├── pnpm-workspace.yaml
 └── apps/
@@ -122,8 +122,8 @@ firewall and make sure both devices are on the same Wi-Fi.
 
 ### Android share sheet
 
-Other apps can share text or links directly to bot-cherry. After the native app
-is installed, choose **bot-cherry** in Android's share sheet; the app opens
+Other apps can share text or links directly to cherry-bot. After the native app
+is installed, choose **cherry-bot** in Android's share sheet; the app opens
 `/responses` with the save modal already filled in. Nothing is sent to the API
 until the user taps **Save**.
 

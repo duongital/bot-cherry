@@ -6,6 +6,7 @@ import { openApiDocument } from "./openapi";
 import { requireSession } from "./lib/session";
 import itemsRoutes from "./routes/items";
 import tagsRoutes from "./routes/tags";
+import healthRoutes from "./routes/health";
 import type { AppEnv } from "./types";
 
 const app = new Hono<AppEnv>();
@@ -50,11 +51,13 @@ app.use("/api/*", (c, next) =>
 // state-changing item/tag requests from origins other than the client.
 app.use("/api/*", async (c, next) => {
   const method = c.req.method.toUpperCase();
-  const isItemOrTagApi =
-    c.req.path.startsWith("/api/items") || c.req.path.startsWith("/api/tags");
+  const isProtectedApi =
+    c.req.path.startsWith("/api/items") ||
+    c.req.path.startsWith("/api/tags") ||
+    c.req.path.startsWith("/api/health/");
 
   if (
-    isItemOrTagApi &&
+    isProtectedApi &&
     method !== "GET" &&
     method !== "HEAD" &&
     method !== "OPTIONS" &&
@@ -73,11 +76,13 @@ app.use("/api/items", requireSession);
 app.use("/api/items/*", requireSession);
 app.use("/api/tags", requireSession);
 app.use("/api/tags/*", requireSession);
+app.use("/api/health/*", requireSession);
 
 app.all("/api/auth/*", (c) => getAuth(c.env).handler(c.req.raw));
 
 app.route("/api/items", itemsRoutes);
 app.route("/api/tags", tagsRoutes);
+app.route("/api/health", healthRoutes);
 
 app.get("/api/health", (c) =>
   c.json({ status: "ok", time: new Date().toISOString() }),

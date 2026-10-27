@@ -58,7 +58,7 @@ export function ResponsesHeader({
             🍒
           </Text>
           <Text style={[styles.brandName, { color: colors.text }]}>
-            bot-cherry
+            cherry-bot
           </Text>
         </View>
         <Pressable

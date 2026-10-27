@@ -1,7 +1,7 @@
 import type { ExpoConfig } from "expo/config";
 
 const config: ExpoConfig = {
-  name: "bot-cherry",
+  name: "cherry-bot",
   owner: "duongital",
   slug: "bot-cherry",
   version: "0.1.0",

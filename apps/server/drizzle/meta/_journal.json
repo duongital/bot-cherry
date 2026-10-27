@@ -15,6 +15,13 @@
       "when": 1792914101421,
       "tag": "0001_powerful_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793110708398,
+      "tag": "0002_famous_cloak",
+      "breakpoints": true
     }
   ]
 }

@@ -6,3 +6,7 @@ DATABASE_URL=postgresql://USER:PASSWORD@your-neon-pooler-host/neondb?sslmode=req
 BETTER_AUTH_URL=http://localhost:8787
 CLIENT_URL=http://localhost:5173
 MOBILE_APP_SCHEME=botcherry
+
+DEEPSEEK_API_KEY=
+# optional: override model (default: deepseek-v4-flash)
+HEALTH_AGENT_MODEL=deepseek-v4-flash

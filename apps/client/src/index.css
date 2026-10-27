@@ -155,6 +155,107 @@ a {
   color: var(--text);
 }
 
+.apps {
+  margin: 0 0 3.5rem;
+}
+
+.apps-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.apps-heading h2,
+.facts h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.apps-heading p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.app-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.app-card:hover {
+  border-color: color-mix(in oklab, var(--color-primary) 55%, var(--border));
+  transform: translateY(-2px);
+}
+
+.app-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.app-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+  font-size: 1.4rem;
+}
+
+.app-card-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.app-card-title {
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.app-card-description {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.app-card-arrow {
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--link);
+  font-size: 1.1rem;
+  transition: transform 180ms ease;
+}
+
+.app-card:hover .app-card-arrow {
+  transform: translateX(3px);
+}
+
 .facts h2 {
   margin: 0 0 1.5rem;
   font-size: 1.5rem;

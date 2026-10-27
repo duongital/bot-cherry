@@ -1,8 +1,14 @@
 import type {
+  AnalyzeHealthResponse,
   CreateItemInput,
+  CreateSymptomLogInput,
+  HealthConversation,
+  HealthMessage,
   ItemListResponse,
   SavedItem,
   SavedItemSummary,
+  SymptomLog,
+  SymptomStat,
   Tag,
   TagNote,
 } from "./types";
@@ -122,5 +128,86 @@ export const tagsApi = {
         body: JSON.stringify({ content }),
       },
     );
+  },
+};
+
+export const healthApi = {
+  analyze(input: {
+    conversationId?: string;
+    message: string;
+  }): Promise<AnalyzeHealthResponse> {
+    return apiFetch<AnalyzeHealthResponse>("/api/health/analyze", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  listConversations(cursor?: string): Promise<{
+    conversations: HealthConversation[];
+    nextCursor: string | null;
+  }> {
+    const query = cursor
+      ? `?cursor=${encodeURIComponent(cursor)}`
+      : "";
+    return apiFetch(`/api/health/conversations${query}`);
+  },
+
+  createConversation(): Promise<HealthConversation> {
+    return apiFetch<HealthConversation>("/api/health/conversations", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+
+  getMessages(conversationId: string): Promise<{
+    conversation: HealthConversation;
+    messages: HealthMessage[];
+  }> {
+    return apiFetch(
+      `/api/health/conversations/${encodeURIComponent(conversationId)}/messages`,
+    );
+  },
+
+  deleteConversation(conversationId: string): Promise<void> {
+    return apiFetch<void>(
+      `/api/health/conversations/${encodeURIComponent(conversationId)}`,
+      { method: "DELETE" },
+    );
+  },
+
+  createLog(input: CreateSymptomLogInput): Promise<{ log: SymptomLog }> {
+    return apiFetch<{ log: SymptomLog }>("/api/health/logs", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  listLogs(params: {
+    from?: string;
+    to?: string;
+    cursor?: string;
+    limit?: number;
+  } = {}): Promise<{
+    logs: SymptomLog[];
+    nextCursor: string | null;
+  }> {
+    const query = new URLSearchParams();
+    if (params.from) query.set("from", params.from);
+    if (params.to) query.set("to", params.to);
+    if (params.cursor) query.set("cursor", params.cursor);
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.size ? `?${query.toString()}` : "";
+    return apiFetch(`/api/health/logs${suffix}`);
+  },
+
+  deleteLog(logId: string): Promise<void> {
+    return apiFetch<void>(
+      `/api/health/logs/${encodeURIComponent(logId)}`,
+      { method: "DELETE" },
+    );
+  },
+
+  stats(days = 30): Promise<{ days: number; stats: SymptomStat[] }> {
+    return apiFetch(`/api/health/symptoms/stats?days=${days}`);
   },
 };

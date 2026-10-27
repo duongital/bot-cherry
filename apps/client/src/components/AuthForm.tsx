@@ -52,7 +52,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       </h1>
       <p className="subtitle">
         {mode === "login"
-          ? "Sign in to keep chatting with bot-cherry."
+          ? "Sign in to keep chatting with cherry-bot."
           : "One account is all you need to get started."}
       </p>
 

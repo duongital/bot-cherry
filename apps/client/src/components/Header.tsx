@@ -29,6 +29,11 @@ function CherryIcon({ className }: { className?: string }) {
   );
 }
 
+const apps = [
+  { name: "Health", to: "/health" },
+  { name: "Reponses", to: "/responses" },
+] as const;
+
 function UserMenu({
   userName,
   signingOut,
@@ -121,6 +126,11 @@ export default function Header() {
   const [signingOut, setSigningOut] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const userName = session.data?.user.name?.trim();
+  const activeApp = apps.find(
+    (app) =>
+      location.pathname === app.to ||
+      location.pathname.startsWith(`${app.to}/`),
+  );
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -170,27 +180,41 @@ export default function Header() {
           <div className="navbar-start gap-1">
             <Link
               to="/"
-              aria-label="Bot Cherry home"
+              aria-label="cherry-bot home"
               className="inline-flex items-center rounded-full p-2 transition-colors hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <CherryIcon className="size-7" />
             </Link>
 
-            <nav aria-label="Main navigation" className="hidden md:block">
-              {session.data && (
-                <NavLink
-                  to="/responses"
-                  className={({ isActive }) =>
-                    `rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                      isActive
-                        ? "bg-base-200 text-base-content"
-                        : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
-                    }`
-                  }
-                >
-                  Responses
-                </NavLink>
-              )}
+            {session.data && activeApp && (
+              <Link
+                to={activeApp.to}
+                className="rounded-full px-1.5 py-1.5 text-sm font-semibold text-base-content transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:hidden"
+              >
+                {activeApp.name}
+              </Link>
+            )}
+
+            <nav
+              aria-label="Main navigation"
+              className="hidden items-center gap-0.5 md:flex"
+            >
+              {session.data &&
+                apps.map((app) => (
+                  <NavLink
+                    key={app.to}
+                    to={app.to}
+                    className={({ isActive }) =>
+                      `rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-base-200 text-base-content"
+                          : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
+                      }`
+                    }
+                  >
+                    {app.name}
+                  </NavLink>
+                ))}
             </nav>
           </div>
 
@@ -276,6 +300,19 @@ export default function Header() {
               {session.data && (
                 <nav aria-label="Mobile navigation" className="flex flex-col gap-1">
                   <NavLink
+                    to="/health"
+                    onClick={() => setDrawerOpen(false)}
+                    className={({ isActive }) =>
+                      `rounded-field px-3 py-2.5 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-base-200 text-base-content"
+                          : "text-base-content/70 hover:bg-base-200 hover:text-base-content"
+                      }`
+                    }
+                  >
+                    Health
+                  </NavLink>
+                  <NavLink
                     to="/responses"
                     onClick={() => setDrawerOpen(false)}
                     className={({ isActive }) =>
@@ -286,7 +323,7 @@ export default function Header() {
                       }`
                     }
                   >
-                    Responses
+                    Reponses
                   </NavLink>
                 </nav>
               )}

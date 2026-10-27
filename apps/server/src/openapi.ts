@@ -18,10 +18,10 @@ const validationError = errorResponse("Validation error");
 export const openApiDocument = {
   openapi: "3.0.3",
   info: {
-    title: "bot-cherry API",
+    title: "cherry-bot API",
     version: "1.0.0",
     description:
-      "Auth + API server for bot-cherry. Auth endpoints are provided by better-auth under `/api/auth/*`.",
+      "Auth + API server for cherry-bot. Auth endpoints are provided by better-auth under `/api/auth/*`.",
   },
   servers: [{ url: "http://localhost:8787" }],
   components: {

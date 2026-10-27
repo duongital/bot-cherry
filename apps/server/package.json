@@ -10,9 +10,11 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^3.0.73",
     "@better-auth/expo": "^1.7.12",
     "@hono/swagger-ui": "^0.5.1",
     "@neondatabase/serverless": "^0.10.4",
+    "ai": "^7.0.153",
     "better-auth": "^1.7.12",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.7.0",

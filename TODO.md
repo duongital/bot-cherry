@@ -2,6 +2,7 @@
 
 - how to deploy backend service to cloudflare?
 - add tailwind css and using daisy ui
+- rename project to cherry-bot and test ci/cd
 
 # main feature
 

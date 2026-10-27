@@ -1,8 +1,11 @@
 import {
   boolean,
+  date,
   index,
+  jsonb,
   pgTable,
   primaryKey,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
@@ -141,6 +144,92 @@ export const savedItemTag = pgTable(
   ],
 );
 
+
+export const healthConversation = pgTable(
+  "health_conversation",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("health_conversation_user_updated_idx").on(t.userId, t.updatedAt),
+  ],
+);
+
+export const symptomLog = pgTable(
+  "symptom_log",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    conversationId: text("conversation_id").references(
+      () => healthConversation.id,
+      { onDelete: "set null" },
+    ),
+    messageId: text("message_id"),
+    logDate: date("log_date").notNull(),
+    rawInput: text("raw_input").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("symptom_log_user_date_idx").on(t.userId, t.logDate)],
+);
+
+export const healthMessage = pgTable(
+  "health_message",
+  {
+    id: text("id").primaryKey(),
+    conversationId: text("conversation_id")
+      .notNull()
+      .references(() => healthConversation.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    // "user" | "assistant"; validated by the API.
+    role: text("role").notNull(),
+    content: text("content").notNull(),
+    form: jsonb("form"),
+    logId: text("log_id").references(() => symptomLog.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("health_message_conversation_created_idx").on(
+      t.conversationId,
+      t.createdAt,
+    ),
+  ],
+);
+
+export const symptomLogEntry = pgTable(
+  "symptom_log_entry",
+  {
+    id: text("id").primaryKey(),
+    logId: text("log_id")
+      .notNull()
+      .references(() => symptomLog.id, { onDelete: "cascade" }),
+    symptom: text("symptom").notNull(),
+    present: boolean("present").notNull(),
+    severity: smallint("severity"),
+    note: text("note"),
+  },
+  (t) => [uniqueIndex("symptom_log_entry_log_symptom_unique").on(t.logId, t.symptom)],
+);
+
 export const schema = {
   user,
   session,
@@ -150,4 +239,8 @@ export const schema = {
   tag,
   tagNote,
   savedItemTag,
+  healthConversation,
+  healthMessage,
+  symptomLog,
+  symptomLogEntry,
 };
